@@ -1,0 +1,31 @@
+{
+  "name": "@xolvio/contentful-migration",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json && chmod +x ./bin/runMigrationsCli.js && chmod +x ./bin/createEnvironmentFromSourceCli.js",
+    "test": "jest"
+  },
+  "main": "./bin/index.js",
+  "dependencies": {
+    "contentful-migrate": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.2.2",
+    "@types/node": "^13.13.5",
+    "@types/react": "^16.9.34",
+    "jest": "^26.0.1",
+    "prettier": "^2.0.5",
+    "testdouble": "^3.13.1",
+    "ts-jest": "^25.5.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3"
+  },
+  "peerDependencies": {
+    "contentful-migrate": "^0.12.0"
+  },
+  "bin": {
+    "xolvio-contentful-migrations": "./bin/runMigrationsCli.js",
+    "xolvio-contentful-create-environment": "./bin/createEnvironmentFromSourceCli.js"
+  }
+}
