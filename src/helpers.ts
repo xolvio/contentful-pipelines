@@ -15,11 +15,24 @@ export const validateMigrationArgs = async (
 
   await createMigrationContentType(migrationParameters);
 
-  return validateMigrationPaths(paths);
+  const validatedPaths = validateMigrationPaths(paths);
+  if (!validatedPaths.length)
+    throw new Error(
+      `None of the provided paths have migrations: ${paths.join(", ")}`
+    );
+  return validatedPaths;
 };
 
-const validateMigrationPaths = (paths: string[]) =>
-  paths.filter((p) => fs.existsSync(`${p}/migrations`));
+const validateMigrationPaths = (paths: string[]) => {
+  return paths.filter((p) => {
+    const pathToCheck = `${process.cwd()}/${p}/migrations`;
+    const pathExists: boolean = fs.existsSync(
+      `${process.cwd()}/${p}/migrations`
+    );
+    if (!pathExists) console.log(`No migrations found at: `, pathToCheck);
+    return pathExists;
+  });
+};
 
 export const checkForMissingArguments = (
   argsToCheck: string[] | { [key: string]: any }

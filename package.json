@@ -1,7 +1,6 @@
 {
   "name": "@xolvio/contentful-migration",
   "version": "0.3.0",
-  "private": true,
   "scripts": {
     "build": "tsc -p ./tsconfig.json && chmod +x ./bin/runMigrationsCli.js && chmod +x ./bin/createEnvironmentFromSourceCli.js",
     "test": "jest"
