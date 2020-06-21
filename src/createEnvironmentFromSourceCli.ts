@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { createEnvironmentFromSource } from "./src/createEnvironmentFromSource";
+import { createEnvironmentFromSource } from "./createEnvironmentFromSource";
 
 (async () => {
   await createEnvironmentFromSource();

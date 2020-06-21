@@ -1,10 +1,11 @@
 {
-  "name": "@xolvio/contentful-migration",
-  "version": "0.3.0",
+  "name": "@xolvio/contentful-pipelines",
+  "version": "0.1.0",
   "scripts": {
     "build": "tsc -p ./tsconfig.json && chmod +x ./bin/runMigrationsCli.js && chmod +x ./bin/createEnvironmentFromSourceCli.js",
     "test": "jest"
   },
+  "types": "./bin/index.d.ts",
   "main": "./bin/index.js",
   "dependencies": {
     "contentful-migrate": "^0.12.0"
