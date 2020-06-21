@@ -1,9 +1,10 @@
 {
   "name": "@xolvio/contentful-pipelines",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "scripts": {
     "build": "tsc -p ./tsconfig.json && chmod +x ./bin/runMigrationsCli.js && chmod +x ./bin/createEnvironmentFromSourceCli.js",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run build"
   },
   "types": "./bin/index.d.ts",
   "main": "./bin/index.js",

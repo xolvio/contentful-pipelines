@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import runMigrations from "./runMigrations";
+import { runMigrations } from "./index";
 
 (async () => {
   const [, , ...paths] = process.argv;

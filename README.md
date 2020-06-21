@@ -20,12 +20,12 @@ your-project
 │   └── components
 │       ├── Title
 │       │    └── migrations
-│       │         ├── 1513695986378-create-title-type.js
-│       │         └── 1513716408272-title-initial-data.js
+│       │         └── title
+│       │               └── 1513695986378-create-title-type.js
 │       └── Sections
 │            └── migrations
-│                 ├── 1513695986378-create-sections-type.js
-│                 └── 1513716408272-sections-initial-data.js
+│                 └── sections
+│                       └── 1513695986378-create-title-type.js
 ├── package.json
 
 ```
