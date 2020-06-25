@@ -1,4 +1,4 @@
-#contentful-pipelines
+# Contentful Pipelines
 
 ## How to Install
 
@@ -10,7 +10,7 @@ npm -D install @xolvio/contentful-pipelines
 
 The `contentful pipelines` package exposes two commands which can be run either as a `package.json` script or executed in the code (runtime).
 
-####Migrations
+#### Migrations
 Given directory structure:
 
 ```
@@ -53,7 +53,7 @@ const { runMigrations } = require("@xolvio/contentful-pipelines");
 await runMigrations(["src/components/Title", "src/components/Sections"]);
 ```
 
-####Creating the contentful environment
+#### Creating the contentful environment
 Running as `package.json` command:
 
 ```shell script
@@ -76,10 +76,10 @@ Example:
 await createEnvironmentFromSource();
 ```
 
-##Writing migration scripts
+## Writing migration scripts
 For executing the migrations we're using [Contentful Migrate Tool](https://github.com/deluan/contentful-migrate) so the migrations are written using their syntax. Using their CLI tool you can quickly create the migration scripts based on the existing Contentful Content Types.
 
-####Useful scripts
+#### Useful scripts
 Fetch existing entry data (used for initial data migration scripts)
 
 ```typescript
