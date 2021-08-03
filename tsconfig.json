@@ -10,9 +10,9 @@
     "outDir": "bin",
     "baseUrl": ".",
     "lib": ["ES2015", "ESNext"],
-    "declaration": true,
+    "declaration": false,
     "skipLibCheck": true
   },
-  "include": ["src/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "**/*.test.ts", "bin"]
 }

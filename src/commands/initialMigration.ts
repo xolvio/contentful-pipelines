@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // vim: set ft=javascript:
 
-import runMigrations from "../runMigrations";
+import { createInitialMigration } from "../createInitialMigration";
 
-exports.command = "up";
+exports.command = "initial-migration";
 
 exports.desc =
-  "Prepares contentful space for the migrations and runs the migrations for specified components.";
+  "Creates initial migrations for the already existing content type.";
 
 exports.builder = (yargs: any) => {
   yargs
@@ -26,7 +26,7 @@ exports.builder = (yargs: any) => {
       default: process.env.CONTENTFUL_SPACE_ID,
       defaultDescription: "environment var CONTENTFUL_SPACE_ID",
     })
-    .option("environment-id", {
+    .option("source-environment", {
       alias: "e",
       describe: "id of the environment within the space",
       type: "string",
@@ -35,11 +35,11 @@ exports.builder = (yargs: any) => {
       defaultDescription:
         "environment var CONTENTFUL_ENV_ID if exists, otherwise master",
     })
-    .option("component-path", {
+    .option("content-type", {
       alias: "c",
-      describe:
-        "list of paths to components you want to run the migrations for",
-      type: "array",
+      describe: "name of the content type for the migrations to create",
+      type: "string",
+      demandOption: true,
       requiresArg: true,
     });
 };
@@ -47,12 +47,13 @@ exports.builder = (yargs: any) => {
 exports.handler = async ({
   accessToken,
   spaceId,
-  environmentId,
-  componentPath,
+  sourceEnvironment,
+  contentType,
 }: any) => {
-  return runMigrations(componentPath, {
-    contentfulManagementApiKey: accessToken,
+  return createInitialMigration({
+    accessToken,
     spaceId,
-    targetEnvironment: environmentId,
+    contentType,
+    sourceEnvironment,
   });
 };

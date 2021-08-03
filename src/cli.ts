@@ -5,7 +5,7 @@
 // noinspection BadExpressionStatementJS
 require('yargs')
   .usage('Manage your Contentful driven components migrations')
-  .commandDir('./commands', {extensions: ["ts"]})
+  .commandDir('./commands', {extensions: ["ts", "js"]})
   .recommendCommands()
   .demandCommand(1, 'Please provide a valid command from the list above')
   .argv;

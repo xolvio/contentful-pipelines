@@ -2,7 +2,7 @@
   "name": "@xolvio/contentful-pipelines",
   "version": "0.1.2",
   "scripts": {
-    "build": "tsc -p ./tsconfig.json && chmod +x ./bin/runMigrationsCli.js && chmod +x ./bin/createEnvironmentFromSourceCli.js",
+    "build": "tsc -p ./tsconfig.json && chmod +x ./bin/cli.js",
     "test": "jest",
     "prepublishOnly": "npm run build"
   },
@@ -31,11 +31,11 @@
     "contentful-migrate": "^0.16.0"
   },
   "bin": {
-    "xolvio-contentful-migrations": "./bin/runMigrationsCli.js",
-    "xolvio-contentful-create-environment": "./bin/createEnvironmentFromSourceCli.js"
+    "xolvio-contentful-migrations": "./bin/cli.js"
   },
   "jest": {
     "preset": "ts-jest",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$",
     "globals": {
       "ts-jest": {
         "diagnostics": false,

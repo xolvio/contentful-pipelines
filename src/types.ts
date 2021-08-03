@@ -8,6 +8,7 @@ export type CreateEnvironmentFromSourceArgs = {
   targetEnvironment: TargetEnvironment;
   spaceId: SpaceId;
   contentfulManagementApiKey: ContentfulManagementApiKey;
+  forceRecreate: boolean;
 };
 
 export type CreateMigrationContentTypeArgs = {

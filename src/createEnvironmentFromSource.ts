@@ -10,11 +10,13 @@ export const createEnvironmentFromSource = async (
     targetEnvironment,
     spaceId,
     contentfulManagementApiKey,
+    forceRecreate,
   }: CreateEnvironmentFromSourceArgs = {
     contentfulManagementApiKey: process.env.CONTENTFUL_MANAGEMENT_API,
     spaceId: process.env.CONTENTFUL_SPACE_ID,
     targetEnvironment: process.env.CONTENTFUL_ENVIRONMENT_ID,
     sourceEnvironment: process.env.CONTENTFUL_SOURCE_ENVIRONMENT,
+    forceRecreate: false,
   }
 ) => {
   checkForMissingArguments({
@@ -23,30 +25,37 @@ export const createEnvironmentFromSource = async (
     spaceId,
     contentfulManagementApiKey,
   });
-  console.log("##### Deleting QA Contentful environment #####");
   const client = contentful.createClient({
     accessToken: contentfulManagementApiKey,
   });
   console.log("Got client");
   const space = await client.getSpace(spaceId);
   console.log("Got space");
+
+  console.log(`Checking if "${targetEnvironment}" already exist`);
+
   const environment = await space
     .getEnvironment(targetEnvironment)
     .catch(console.log);
-  if (environment) {
-    console.log("Got environment");
+
+  if (environment && !forceRecreate)
+    throw new Error(
+      `Cannot create new "${targetEnvironment}" environment because one with the same name already exists. Run the command with "-f" option to force recreate the environment.`
+    );
+
+  if (environment && forceRecreate) {
+    console.log("Deleting existing environment");
     await environment.delete();
-    console.log("Deleted the old environment");
   }
 
   const sourceEnv = sourceEnvironment || "master";
   console.log(
-    `##### Creating QA Contentful environment from ${sourceEnv} env snapshot #####`
+    `##### Creating "${targetEnvironment}" Contentful environment from "${sourceEnv}" env snapshot #####`
   );
   const newEnv = await space
     .createEnvironmentWithId(
       targetEnvironment,
-      { name: "QA environment" },
+      { name: `${targetEnvironment} environment` },
       sourceEnv
     )
     .catch(console.log);
