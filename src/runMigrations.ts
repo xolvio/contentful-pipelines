@@ -20,7 +20,7 @@ export default async function runMigrations(
     targetEnvironment: process.env.CONTENTFUL_ENVIRONMENT_ID,
   }
 ) {
-  const paths = await validateMigrationArgs([migrationPath], {
+  const paths = await validateMigrationArgs(migrationPath && [migrationPath], {
     contentfulManagementApiKey,
     spaceId,
     targetEnvironment,
