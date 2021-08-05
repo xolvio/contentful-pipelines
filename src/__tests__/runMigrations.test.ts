@@ -1,35 +1,50 @@
-import getComponentsForMigration from "../src/runMigrations";
+import fsPromise from "fs/promises";
+import fsExtra from "fs-extra";
+import fs from "fs";
+import child_process from "child_process";
+import getComponentsForMigration from "../runMigrations";
+import * as cmct from "../createMigrationContentType";
+import { missingArgError } from "../helpers";
+import { RunMigrationsArgs } from "../types";
 
-import { spawn } from "child_process";
-import createMigrationContentType from "../src/createMigrationContentType";
-import { missingArgError } from "../src/helpers";
-import { RunMigrationsArgs } from "../src/types";
+const existsSync = jest.spyOn(fs, "existsSync");
+const copy = jest.spyOn(fsExtra, "copy");
+const remove = jest.spyOn(fsExtra, "remove");
+const mkdtemp = jest.spyOn(fsPromise, "mkdtemp");
+const spawn = jest.spyOn(child_process, "spawn");
+const createMigrationContentType = jest.spyOn(cmct, "default");
 
-jest.mock("child_process");
-jest.mock("../src/createMigrationContentType");
-
-const listOfMigrations = ["__tests__/TestComponent"];
+const listOfMigrations = ["src/__tests__/TestComponent"];
 
 beforeEach(() => {
+  copy.mockImplementation(() => {});
+  remove.mockImplementation(async () => {});
+  mkdtemp.mockImplementation(async () => listOfMigrations[0]);
+  existsSync.mockImplementation((path: string) => path.includes("__tests__"));
   spawn.mockReturnValue({
+    // @ts-ignore
     stdout: {
       on: jest.fn(),
     },
+    // @ts-ignore
     stderr: {
       on: jest.fn(),
     },
-    on: jest.fn((e, cb) => setTimeout(() => cb(0), 100)),
+    // @ts-ignore
+    on: jest.fn((e, cb) => e !== "error" && setTimeout(() => cb(0), 100)),
   });
 
-  createMigrationContentType.mockResolvedValue(true);
+  createMigrationContentType.mockResolvedValue(Promise.resolve());
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  spawn.mockReset();
+  createMigrationContentType.mockReset();
 });
 
 afterAll(() => {
-  jest.restoreAllMocks();
+  spawn.mockRestore();
+  createMigrationContentType.mockRestore();
 });
 
 test("Throws error if provided empty list of migration paths", () => {
@@ -39,6 +54,7 @@ test("Throws error if provided empty list of migration paths", () => {
 });
 
 test("Throws error if did not provide migration paths as function argument", () => {
+  //@ts-expect-error
   return getComponentsForMigration().catch((e) => {
     expect(e).toEqual(new Error("Migration paths need to be provided"));
   });
@@ -95,7 +111,7 @@ test.each(
   "Throws error if %s environment and migrationParameter variable not defined",
   (testEnv) => {
     expect.assertions(1);
-    const params: RunMigrationsArgs = {
+    const params: RunMigrationsArgs & { [key: string]: string } = {
       targetEnvironment: "1",
       spaceId: "2",
       contentfulManagementApiKey: "3",

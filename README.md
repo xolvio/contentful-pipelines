@@ -107,3 +107,5 @@ module.exports.up = async (migration, { makeRequest }) => {
   });
 };
 ```
+## TODO
+- CLI for running migrations for all of the components listed in the package.json
