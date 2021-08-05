@@ -14,12 +14,12 @@ const mkdtemp = jest.spyOn(fsPromise, "mkdtemp");
 const spawn = jest.spyOn(child_process, "spawn");
 const createMigrationContentType = jest.spyOn(cmct, "default");
 
-const listOfMigrations = ["src/__tests__/TestComponent"];
+const migrationsPathGlob = "src/__tests__/TestComponent";
 
 beforeEach(() => {
   copy.mockImplementation(() => {});
   remove.mockImplementation(async () => {});
-  mkdtemp.mockImplementation(async () => listOfMigrations[0]);
+  mkdtemp.mockImplementation(async () => migrationsPathGlob);
   existsSync.mockImplementation((path: string) => path.includes("__tests__"));
   spawn.mockReturnValue({
     // @ts-ignore
@@ -47,59 +47,46 @@ afterAll(() => {
   createMigrationContentType.mockRestore();
 });
 
-test("Throws error if provided empty list of migration paths", () => {
-  return getComponentsForMigration([]).catch((e) => {
-    expect(e).toEqual(new Error("Migration paths cannot be empty."));
-  });
-});
-
 test("Throws error if did not provide migration paths as function argument", () => {
   //@ts-expect-error
   return getComponentsForMigration().catch((e) => {
-    expect(e).toEqual(new Error("Migration paths need to be provided"));
+    expect(e).toEqual(new Error("Migration path glob must be provided"));
   });
 });
 
 test("Runs migrations only for the paths which contain migration scripts", async () => {
-  const oneGoodOneBad = [...listOfMigrations, "this/path/doesnot/exist"];
-  await getComponentsForMigration(oneGoodOneBad, {
+  await getComponentsForMigration(migrationsPathGlob, {
     targetEnvironment: "environment-id",
     spaceId: "space-id",
     contentfulManagementApiKey: "contentful-api-key",
   });
 
-  listOfMigrations.forEach((migration, i) => {
-    expect(spawn.mock.calls[i][2].cwd).toMatch(migration);
-  });
+  expect(spawn.mock.calls[0][2].cwd).toMatch(migrationsPathGlob);
 
   expect(spawn.mock.calls.length).toEqual(1);
 });
 
 test("Checks if spawn was called with proper arguments", async () => {
-  await getComponentsForMigration(listOfMigrations, {
+  await getComponentsForMigration(migrationsPathGlob, {
     targetEnvironment: "environment-id",
     spaceId: "space-id",
     contentfulManagementApiKey: "contentful-api-key",
   });
 
-  listOfMigrations.forEach((migration, i) => {
-    const migrationPathSplit = migration.split("/");
-    const contentTypeName = migrationPathSplit[migrationPathSplit.length - 1];
-    expect(spawn.mock.calls[i][0]).toMatch("/node_modules/.bin/ctf-migrate");
-    expect(spawn.mock.calls[i][1]).toEqual([
-      "up",
-      "-a",
-      "-t",
-      "contentful-api-key",
-      "-s",
-      "space-id",
-      "-e",
-      "environment-id",
-    ]);
-    expect(spawn.mock.calls[i][2].cwd).toMatch(migration);
-  });
-
-  expect(spawn.mock.calls.length).toEqual(listOfMigrations.length);
+  const migrationPathSplit = migrationsPathGlob.split("/");
+  const contentTypeName = migrationPathSplit[migrationPathSplit.length - 1];
+  expect(spawn.mock.calls[0][0]).toMatch("/node_modules/.bin/ctf-migrate");
+  expect(spawn.mock.calls[0][1]).toEqual([
+    "up",
+    "-a",
+    "-t",
+    "contentful-api-key",
+    "-s",
+    "space-id",
+    "-e",
+    "environment-id",
+  ]);
+  expect(spawn.mock.calls[0][2].cwd).toMatch(migrationsPathGlob);
 });
 test.each(
   Object.keys({
@@ -117,7 +104,7 @@ test.each(
       contentfulManagementApiKey: "3",
     };
     delete params[testEnv];
-    return getComponentsForMigration(listOfMigrations, params).catch((e) => {
+    return getComponentsForMigration(migrationsPathGlob, params).catch((e) => {
       expect(e).toEqual(missingArgError(testEnv));
     });
   }

@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import glob from "glob";
 import {
   mergeMigrations,
   removeMergeMigrationsTmpDir,
@@ -13,7 +14,7 @@ const defaultParamValues = {
 };
 
 export default async function runMigrations(
-  migrationPath: string[],
+  migrationPathGlob: string,
   {
     targetEnvironment = defaultParamValues.targetEnvironment,
     spaceId = defaultParamValues.spaceId,
@@ -24,12 +25,25 @@ export default async function runMigrations(
     targetEnvironment: process.env.CONTENTFUL_ENVIRONMENT_ID,
   }
 ) {
-  const paths = await validateMigrationArgs(migrationPath, {
+  if (!migrationPathGlob)
+    throw new Error("Migration path glob must be provided");
+
+  const migrationPaths = await new Promise<string[]>((res, rej) => {
+    glob(`${process.cwd()}/${migrationPathGlob}`, (e, files) => {
+      if (e) {
+        console.log("Error during search for migration paths", e);
+        res([]);
+      }
+      res(files);
+    });
+  });
+
+  const paths = await validateMigrationArgs(migrationPaths, {
     contentfulManagementApiKey,
     spaceId,
     targetEnvironment,
   });
-  console.log("Running migrations for:", migrationPath);
+  console.log("Running migrations for:", paths);
 
   const mergedPath = await mergeMigrations(paths);
 

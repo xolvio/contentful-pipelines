@@ -47,7 +47,6 @@ exports.builder = (yargs: any) => {
       requiresArg: true,
     })
     .check((argv: any, options: any) => {
-      console.log("MICHAL: options", options);
       if (argv.targetEnvironment === argv.sourceEnvironment)
         throw new Error("Target and Source environment cannot be the same.");
 

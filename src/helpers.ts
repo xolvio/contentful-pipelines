@@ -29,7 +29,7 @@ export const validateMigrationArgs = async (
 
 const validateMigrationPaths = (paths: string[]) => {
   return paths.filter((p) => {
-    const pathToCheck = `${process.cwd()}/${p}/migrations`;
+    const pathToCheck = `${p}/migrations`;
     const pathExists: boolean = fs.existsSync(pathToCheck);
     if (!pathExists) console.log(`No migrations found at: `, pathToCheck);
     return pathExists;
@@ -63,7 +63,7 @@ export const mergeMigrations = async (paths: string[]): Promise<string> => {
 
     for (let i = 0; i < paths.length; i++) {
       await fsExtra.copy(
-        `${process.cwd()}/${paths[i]}/migrations`,
+        `${paths[i]}/migrations`,
         `${tmpDirPath}/migrations`
       );
     }
