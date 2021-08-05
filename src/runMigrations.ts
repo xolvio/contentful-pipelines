@@ -1,5 +1,9 @@
 import { spawn } from "child_process";
-import { validateMigrationArgs } from "./helpers";
+import {
+  mergeMigrations,
+  removeMergeMigrationsTmpDir,
+  validateMigrationArgs,
+} from "./helpers";
 import { RunMigrationsArgs } from "./types";
 
 const defaultParamValues = {
@@ -9,7 +13,7 @@ const defaultParamValues = {
 };
 
 export default async function runMigrations(
-  migrationPath: string,
+  migrationPath: string[],
   {
     targetEnvironment = defaultParamValues.targetEnvironment,
     spaceId = defaultParamValues.spaceId,
@@ -20,12 +24,14 @@ export default async function runMigrations(
     targetEnvironment: process.env.CONTENTFUL_ENVIRONMENT_ID,
   }
 ) {
-  const paths = await validateMigrationArgs(migrationPath && [migrationPath], {
+  const paths = await validateMigrationArgs(migrationPath, {
     contentfulManagementApiKey,
     spaceId,
     targetEnvironment,
   });
   console.log("Running migrations for:", migrationPath);
+
+  const mergedPath = await mergeMigrations(paths);
 
   await new Promise((resolve) => {
     const migrate = spawn(
@@ -41,7 +47,7 @@ export default async function runMigrations(
         targetEnvironment,
       ],
       {
-        cwd: `${process.cwd()}/${paths[0]}`,
+        cwd: mergedPath,
         env: process.env,
       }
     );
@@ -54,7 +60,7 @@ export default async function runMigrations(
     });
     migrate.on("error", (err: any) => {
       console.log(
-        `######### Failed to run migrations from: ${migrationPath} ######### `
+        `######### Failed to run migrations from: ${mergedPath} ######### `
       );
       resolve(false);
     });
@@ -62,7 +68,7 @@ export default async function runMigrations(
       const isSuccess = code === 0;
       if (isSuccess)
         console.log(
-          `######### FINISHED migrations from: ${migrationPath} ######### `
+          `######### FINISHED migrations from: ${mergedPath} ######### `
         );
       else
         console.log(
@@ -71,4 +77,6 @@ export default async function runMigrations(
       resolve(isSuccess);
     });
   });
+
+  await removeMergeMigrationsTmpDir(mergedPath);
 }

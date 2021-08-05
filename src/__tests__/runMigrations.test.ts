@@ -47,7 +47,7 @@ afterAll(() => {
   createMigrationContentType.mockRestore();
 });
 
-test.skip("Throws error if provided empty list of migration paths", () => {
+test("Throws error if provided empty list of migration paths", () => {
   return getComponentsForMigration([]).catch((e) => {
     expect(e).toEqual(new Error("Migration paths cannot be empty."));
   });

@@ -38,8 +38,9 @@ exports.builder = (yargs: any) => {
     .option("component-path", {
       alias: "c",
       describe:
-        "path to component you want to run the migrations for",
-      type: "string",
+        "paths to components you want to run the migrations for",
+      type: "array",
+      demandOption: true,
       requiresArg: true,
     });
 };

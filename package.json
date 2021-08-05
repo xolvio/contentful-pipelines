@@ -1,6 +1,6 @@
 {
   "name": "@xolvio/contentful-pipelines",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "build": "tsc -p ./tsconfig.json && chmod +x ./bin/cli.js",
     "test": "jest",

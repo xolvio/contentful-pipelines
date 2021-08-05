@@ -10,23 +10,19 @@ export const createInitialMigration = async ({
   accessToken,
   sourceEnvironment,
   contentType,
+  initialData,
 }: {
   spaceId: string;
   accessToken: string;
   sourceEnvironment: string;
   contentType: string;
+  initialData: boolean;
 }) => {
   const client = contentful.createClient({
     accessToken,
   });
   const space = await client.getSpace(spaceId);
   const environment = await space.getEnvironment(sourceEnvironment);
-  const entry = await environment.getEntries({
-    include: 10,
-    limit: 1,
-    content_type: contentType,
-    locale: "en-US",
-  });
 
   await bootstrapCtfContentType(
     spaceId,
@@ -37,16 +33,30 @@ export const createInitialMigration = async ({
     false
   );
 
+  let initialEntry = null;
+  if (initialData)
+    initialEntry = await environment.getEntries({
+      include: 10,
+      limit: 1,
+      content_type: contentType,
+      locale: "en-US",
+    });
+
   console.log("Initial Content type migrations created.");
 
-  if (!entry?.items?.length) {
+  if (!initialData) {
+    console.log("Skipping creation of initial data migration.");
+    return;
+  }
+
+  if (!initialEntry?.items?.length && initialData) {
     console.log(
       `No entry found for ${contentType}. Skipping creation of initial data migration.`
     );
     return;
   }
 
-  const entryInitialData = entry.items[0].fields;
+  const entryInitialData = initialEntry.items[0].fields;
 
   const r = await fs.readdir(`${process.cwd()}/migrations/${contentType}`);
 

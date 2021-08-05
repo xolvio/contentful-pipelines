@@ -41,6 +41,14 @@ exports.builder = (yargs: any) => {
       type: "string",
       demandOption: true,
       requiresArg: true,
+    })
+    .option("initial-data", {
+      alias: "i",
+      describe: "should it also create initial data migration",
+      type: "boolean",
+      default: false,
+      demandOption: false,
+      requiresArg: false,
     });
 };
 
@@ -49,11 +57,13 @@ exports.handler = async ({
   spaceId,
   sourceEnvironment,
   contentType,
+  initialData,
 }: any) => {
   return createInitialMigration({
     accessToken,
     spaceId,
     contentType,
     sourceEnvironment,
+    initialData
   });
 };
