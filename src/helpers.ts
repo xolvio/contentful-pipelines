@@ -58,7 +58,7 @@ export const mergeMigrations = async (paths: string[]): Promise<string> => {
   try {
     console.log("Creating the tmp migrations dir");
     tmpDirPath = await fsPromise.mkdtemp(
-      path.join(os.tmpdir(), "xolvio-ctf-migrations")
+      path.join(process.cwd(), "xolvio-ctf-migrations")
     );
 
     for (let i = 0; i < paths.length; i++) {
