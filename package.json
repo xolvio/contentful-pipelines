@@ -31,7 +31,7 @@
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
-    "contentful-migrate": "^0.16.0"
+    "contentful-migrate": "^0.17.0"
   },
   "bin": {
     "xolvio-contentful-migrations": "./bin/cli.js"
