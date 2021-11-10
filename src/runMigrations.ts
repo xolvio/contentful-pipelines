@@ -47,6 +47,8 @@ export default async function runMigrations(
 
   const mergedPath = await mergeMigrations(paths);
 
+  const errorList: string[] = []
+
   await new Promise((resolve) => {
     const migrate = spawn(
       `${process.cwd()}/node_modules/.bin/ctf-migrate`,
@@ -70,6 +72,7 @@ export default async function runMigrations(
       console.log(stdout.toString());
     });
     migrate.stderr.on("data", (stderr: string) => {
+      errorList.push(stderr.toString())
       console.log(stderr.toString());
     });
     migrate.on("error", (err: any) => {
@@ -84,13 +87,18 @@ export default async function runMigrations(
         console.log(
           `######### FINISHED migrations from: ${mergedPath} ######### `
         );
-      else
+      else {
         console.log(
           `content-migration: child process exited with code ${code}`
         );
+      }
       resolve(isSuccess);
     });
   });
 
   await removeMergeMigrationsTmpDir(mergedPath);
+
+  if (errorList.length) {
+    throw new Error(`Encountered following errors: ${errorList.join('\n')}`)
+  }
 }
