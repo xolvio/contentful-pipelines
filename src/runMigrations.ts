@@ -47,50 +47,59 @@ export default async function runMigrations(
 
   const mergedPath = await mergeMigrations(paths);
 
-  await new Promise((resolve) => {
-    const migrate = spawn(
-      `${process.cwd()}/node_modules/.bin/ctf-migrate`,
-      [
-        "up",
-        "-a",
-        "-t",
-        contentfulManagementApiKey,
-        "-s",
-        spaceId,
-        "-e",
-        targetEnvironment,
-      ],
-      {
-        cwd: mergedPath,
-        env: process.env,
-      }
-    );
-
-    migrate.stdout.on("data", (stdout: string) => {
-      console.log(stdout.toString());
-    });
-    migrate.stderr.on("data", (stderr: string) => {
-      console.log(stderr.toString());
-    });
-    migrate.on("error", (err: any) => {
-      console.log(
-        `######### Failed to run migrations from: ${mergedPath} ######### `
+  try {
+    await new Promise((resolve, reject) => {
+      const migrate = spawn(
+        `${process.cwd()}/node_modules/.bin/ctf-migrate`,
+        [
+          "up",
+          "-a",
+          "-t",
+          contentfulManagementApiKey,
+          "-s",
+          spaceId,
+          "-e",
+          targetEnvironment,
+        ],
+        {
+          cwd: mergedPath,
+          env: process.env,
+        }
       );
-      resolve(false);
-    });
-    migrate.on("close", (code: number) => {
-      const isSuccess = code === 0;
-      if (isSuccess)
-        console.log(
-          `######### FINISHED migrations from: ${mergedPath} ######### `
-        );
-      else
-        console.log(
-          `content-migration: child process exited with code ${code}`
-        );
-      resolve(isSuccess);
-    });
-  });
 
-  await removeMergeMigrationsTmpDir(mergedPath);
+      migrate.stdout.on("data", (stdout: string) => {
+        console.log(stdout.toString());
+      });
+      migrate.stderr.on("data", (stderr: string) => {
+        console.log(stderr.toString());
+      });
+      migrate.on("error", (err: any) => {
+        console.log(
+          `######### Failed to run migrations from: ${mergedPath} ######### `
+        );
+        resolve(false);
+      });
+      migrate.on("close", (code: number) => {
+        const isSuccess = code === 0;
+        if (isSuccess)
+          console.log(
+            `######### FINISHED migrations from: ${mergedPath} ######### `
+          );
+        else
+          console.log(
+            `content-migration: child process exited with code ${code}`
+          );
+        if (isSuccess) {
+          resolve(isSuccess);
+        } else {
+          reject(isSuccess)
+        }
+      });
+    });
+  } catch (e) {
+    console.log("Error", e)
+    throw new Error(e);
+  } finally {
+    await removeMergeMigrationsTmpDir(mergedPath);
+  }
 }
